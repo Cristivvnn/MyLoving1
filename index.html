@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuestro Espacio - App Completa</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcf8f7;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .heading-font {
+            font-family: 'Comfortaa', cursive;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Animación para el botón principal de Pensando */
+        @keyframes pulse-heart {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+        .pulse-active {
+            animation: pulse-heart 0.3s ease-in-out;
+        }
+
+        /* Animación para el Latido del Splash Screen */
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            15% { transform: scale(1.25); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.25); }
+        }
+        .animate-heartbeat {
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        /* Animación de la Ruleta */
+        @keyframes spin-slow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(1080deg); }
+        }
+        .spinning {
+            animation: spin-slow 2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="max-w-md mx-auto h-screen flex flex-col shadow-2xl bg-white border-x border-pink-100 overflow-hidden relative">
+
+    <!-- ================= SPLASH SCREEN (Pantalla de Carga) ================= -->
+    <div id="splash-screen" class="fixed inset-0 bg-gradient-to-br from-rose-400 to-pink-600 z-[100] flex flex-col items-center justify-center transition-opacity duration-700 ease-out">
+        <div class="text-white text-8xl mb-6 animate-heartbeat drop-shadow-2xl">
+            <i class="fa-solid fa-hands-holding-heart"></i>
+        </div>
+        <h1 class="heading-font text-white text-3xl font-bold tracking-wider drop-shadow-md">Nuestro Espacio</h1>
+        <p class="text-rose-100 text-sm mt-3 animate-pulse font-medium">Cargando amor...</p>
+    </div>
+
+    <!-- CABECERA -->
+    <header class="bg-gradient-to-r from-rose-400 to-pink-500 text-white p-4 text-center rounded-b-2xl shadow-md z-10">
+        <h1 class="heading-font text-xl font-bold tracking-wide flex items-center justify-center gap-2">
+            <i class="fa-solid fa-heart-pulse animate-pulse"></i> Nuestro Espacio
+        </h1>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="flex-1 overflow-y-auto p-4 pb-24 no-scrollbar">
+
+        <!-- ================= PANTALLA 1: PENSANDO EN TI ================= -->
+        <section id="tab-pensando" class="space-y-6 block">
+            <div class="bg-gradient-to-br from-rose-50 to-pink-50 p-6 rounded-2xl border border-rose-100 text-center space-y-4 shadow-sm">
+                <h2 class="heading-font text-gray-700 font-bold text-lg">¿Pensando en tu personita?</h2>
+                <p class="text-xs text-gray-500">Toca el botón cada vez que te acuerdes de ella.</p>
+                
+                <div class="relative flex justify-center py-4">
+                    <button id="btn-heart" class="w-28 h-28 bg-gradient-to-br from-rose-400 to-pink-500 rounded-full text-white text-4xl shadow-lg flex items-center justify-center active:scale-95 transition-transform focus:outline-none cursor-pointer">
+                        <i class="fa-solid fa-heart"></i>
+                    </button>
+                    <span id="heart-counter" class="absolute -top-1 right-24 bg-pink-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md">0</span>
+                </div>
+                <p class="text-sm text-rose-600 font-medium heading-font" id="heart-status">¡Aún no has tocado hoy!</p>
+            </div>
+
+            <div class="flex flex-col h-80 bg-gray-50 rounded-2xl border border-gray-200 p-3 shadow-inner">
+                <div class="flex justify-between items-center border-b border-gray-200 pb-2 mb-2">
+                    <span class="text-xs font-bold text-gray-600 heading-font flex items-center gap-1">
+                        <i class="fa-solid fa-clock text-rose-400"></i> Notas Rápidas (24h)
+                    </span>
+                    <span class="text-[10px] text-gray-400">Desaparecen solas</span>
+                </div>
+                
+                <div id="chat-messages" class="flex-1 overflow-y-auto space-y-2 pr-1 no-scrollbar text-sm flex flex-col">
+                    <!-- Mensajes se cargan aquí -->
+                </div>
+
+                <div class="mt-2 flex gap-2">
+                    <input type="text" id="chat-input" placeholder="Deja un mensajito..." class="flex-1 px-3 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-pink-400 bg-white">
+                    <button id="btn-send-chat" class="bg-pink-500 text-white px-3 py-2 rounded-xl text-sm hover:bg-pink-600 active:scale-95 transition-transform cursor-pointer">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PANTALLA 2: CINE EN PAREJA ================= -->
+        <section id="tab-cine" class="space-y-4 hidden">
+            <div class="bg-gradient-to-br from-purple-50 to-indigo-50 p-4 rounded-2xl border border-purple-100 shadow-sm space-y-3">
+                <h2 class="heading-font text-purple-800 font-bold text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-film"></i> ¿Qué vemos hoy?
+                </h2>
+                
+                <div class="grid grid-cols-3 gap-2 text-xs font-semibold">
+                    <button onclick="selectGenre('romance')" class="genre-btn p-2 rounded-xl bg-purple-600 text-white text-center transition-colors cursor-pointer">Romance</button>
+                    <button onclick="selectGenre('comedia')" class="genre-btn p-2 rounded-xl bg-white border border-purple-200 text-purple-700 text-center transition-colors cursor-pointer">Comedia</button>
+                    <button onclick="selectGenre('terror')" class="genre-btn p-2 rounded-xl bg-white border border-purple-200 text-purple-700 text-center transition-colors cursor-pointer">Terror</button>
+                    <button onclick="selectGenre('accion')" class="genre-btn p-2 rounded-xl bg-white border border-purple-200 text-purple-700 text-center transition-colors cursor-pointer">Acción</button>
+                    <button onclick="selectGenre('animacion')" class="genre-btn p-2 rounded-xl bg-white border border-purple-200 text-purple-700 text-center transition-colors cursor-pointer">Animación</button>
+                    <button onclick="selectGenre('sci-fi')" class="genre-btn p-2 rounded-xl bg-white border border-purple-200 text-purple-700 text-center transition-colors cursor-pointer">Sci-Fi</button>
+                </div>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm text-center space-y-4">
+                <div class="flex justify-center">
+                    <div id="wheel-cine-container" class="relative w-24 h-24 rounded-full bg-gradient-to-tr from-purple-400 to-indigo-600 flex items-center justify-center text-white text-3xl shadow-md">
+                        <i class="fa-solid fa-clapperboard" id="icon-cine"></i>
+                    </div>
+                </div>
+                
+                <button id="btn-spin-cine" class="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white py-3 rounded-xl font-bold text-sm shadow-md active:scale-98 transition-transform cursor-pointer">
+                    <i class="fa-solid fa-dice"></i> Girar Ruleta de Películas
+                </button>
+
+                <div id="cine-result" class="p-3 bg-purple-50 rounded-xl border border-purple-100 hidden">
+                    <span class="text-[10px] uppercase font-bold text-purple-500 tracking-wider block" id="result-genre-label">GÉNERO</span>
+                    <h3 class="font-bold text-gray-800 text-base mt-0.5" id="result-movie-title">Nombre</h3>
+                </div>
+
+                <div class="text-left space-y-2">
+                    <h4 class="text-xs font-bold text-gray-500 heading-font" id="movie-list-title">Opciones disponibles:</h4>
+                    <ul id="movie-list" class="text-xs text-gray-600 space-y-1 bg-gray-50 p-2 rounded-xl max-h-40 overflow-y-auto no-scrollbar">
+                        <!-- Lista dinámica -->
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PANTALLA 3: SABORES Y SNACKS ================= -->
+        <section id="tab-sabores" class="space-y-4 hidden">
+            <div class="bg-gradient-to-br from-amber-50 to-orange-50 p-4 rounded-2xl border border-amber-100 shadow-sm space-y-3">
+                <h2 class="heading-font text-amber-800 font-bold text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-utensils"></i> Sabores & Snacks
+                </h2>
+                <p class="text-xs text-gray-500">¿Antojo de un snack chileno o una comida rápida? Deja que la ruleta elija el bajón del día.</p>
+                
+                <div class="grid grid-cols-3 gap-2 text-xs font-semibold">
+                    <button onclick="selectSabor('dulce')" id="btn-sabor-dulce" class="sabor-btn p-2 rounded-xl bg-amber-500 text-white text-center transition-colors cursor-pointer">🧁 Snacks Dulces</button>
+                    <button onclick="selectSabor('salado')" id="btn-sabor-salado" class="sabor-btn p-2 rounded-xl bg-white border border-amber-200 text-amber-700 text-center transition-colors cursor-pointer">🍟 Snacks Salados</button>
+                    <button onclick="selectSabor('comida_rapida')" id="btn-sabor-comida_rapida" class="sabor-btn p-2 rounded-xl bg-white border border-amber-200 text-amber-700 text-center transition-colors cursor-pointer">🍔 Comida Rápida</button>
+                </div>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm text-center space-y-4">
+                <div class="flex justify-center">
+                    <div id="wheel-sabor-container" class="w-24 h-24 rounded-full bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-white text-3xl shadow-md">
+                        <i class="fa-solid fa-cookie-bite" id="icon-sabor"></i>
+                    </div>
+                </div>
+                
+                <button id="btn-spin-sabor" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 rounded-xl font-bold text-sm shadow-md active:scale-98 transition-transform cursor-pointer">
+                    <i class="fa-solid fa-rotate"></i> Girar Ruleta de Antojos
+                </button>
+
+                <div id="sabor-result" class="p-3 bg-amber-50 rounded-xl border border-amber-100 hidden">
+                    <span class="text-[10px] uppercase font-bold text-amber-600 tracking-wider block" id="result-sabor-label">ANTOJO ELEGIDO</span>
+                    <h3 class="font-bold text-gray-800 text-base mt-0.5" id="result-food-title">¡Sorpresa!</h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PANTALLA 4: TÚ O YO ================= -->
+        <section id="tab-azar" class="space-y-4 hidden">
+            <div class="bg-gradient-to-br from-teal-50 to-emerald-50 p-4 rounded-2xl border border-teal-100 shadow-sm space-y-3">
+                <h2 class="heading-font text-teal-800 font-bold text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-scale-balanced"></i> Elige: Tú o Yo
+                </h2>
+                <p class="text-xs text-gray-500">¿No se ponen de acuerdo? Escriban dos opciones y dejen que la ruleta decida el destino.</p>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm text-center space-y-4">
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-teal-100 text-teal-700 font-bold rounded-full w-7 h-7 flex items-center justify-center text-xs shrink-0">1</span>
+                        <input type="text" id="opcion-1" placeholder="Ej: Pedir sushi..." class="flex-1 px-3 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-teal-400 bg-gray-50">
+                    </div>
+                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">VS</div>
+                    <div class="flex items-center gap-2">
+                        <span class="bg-emerald-100 text-emerald-700 font-bold rounded-full w-7 h-7 flex items-center justify-center text-xs shrink-0">2</span>
+                        <input type="text" id="opcion-2" placeholder="Ej: Cocinar pasta..." class="flex-1 px-3 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-emerald-400 bg-gray-50">
+                    </div>
+                </div>
+
+                <div class="flex justify-center pt-4">
+                    <div id="wheel-azar-container" class="w-24 h-24 rounded-full bg-gradient-to-tr from-teal-400 to-emerald-500 flex items-center justify-center text-white text-3xl shadow-md">
+                        <i class="fa-solid fa-question" id="icon-azar"></i>
+                    </div>
+                </div>
+                
+                <button id="btn-spin-azar" class="w-full bg-gradient-to-r from-teal-500 to-emerald-500 text-white py-3 rounded-xl font-bold text-sm shadow-md active:scale-98 transition-transform cursor-pointer">
+                    <i class="fa-solid fa-bolt"></i> Decidir al Azar
+                </button>
+
+                <div id="azar-result" class="p-4 bg-teal-50 rounded-xl border border-teal-200 hidden">
+                    <span class="text-[10px] uppercase font-bold text-teal-600 tracking-wider block">LA RULETA HA HABLADO</span>
+                    <h3 class="font-bold text-gray-800 text-lg mt-1" id="result-azar-title">¡Opción ganadora!</h3>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- NAVEGACIÓN INFERIOR -->
+    <nav class="absolute bottom-0 left-0 right-0 h-16 bg-white border-t border-gray-200 flex justify-around items-center px-1 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-50">
+        <button onclick="switchTab('tab-pensando')" id="nav-tab-pensando" class="flex flex-col items-center justify-center text-rose-500 focus:outline-none flex-1 py-1 cursor-pointer">
+            <i class="fa-solid fa-heart text-xl"></i>
+            <span class="text-[10px] mt-0.5 font-semibold">Pensando</span>
+        </button>
+        <button onclick="switchTab('tab-cine')" id="nav-tab-cine" class="flex flex-col items-center justify-center text-gray-400 focus:outline-none flex-1 py-1 cursor-pointer">
+            <i class="fa-solid fa-film text-xl"></i>
+            <span class="text-[10px] mt-0.5 font-semibold">Cine</span>
+        </button>
+        <button onclick="switchTab('tab-sabores')" id="nav-tab-sabores" class="flex flex-col items-center justify-center text-gray-400 focus:outline-none flex-1 py-1 cursor-pointer">
+            <i class="fa-solid fa-utensils text-xl"></i>
+            <span class="text-[10px] mt-0.5 font-semibold">Snacks</span>
+        </button>
+        <button onclick="switchTab('tab-azar')" id="nav-tab-azar" class="flex flex-col items-center justify-center text-gray-400 focus:outline-none flex-1 py-1 cursor-pointer">
+            <i class="fa-solid fa-scale-balanced text-xl"></i>
+            <span class="text-[10px] mt-0.5 font-semibold">Tú o Yo</span>
+        </button>
+    </nav>
+
+    <!-- LÓGICA -->
+    <script>
+        // --- BASES DE DATOS EXPANDIDAS ---
+        const peliculas = {
+            romance: [
+                "Cuestión de Tiempo", "La La Land", "Yo Antes de Ti", "Votos de Amor", "Diario de una Pasión", 
+                "Cualquiera menos tú", "10 cosas que odio de ti", "Orgullo y Prejuicio", "Titanic", "Bajo la Misma Estrella", 
+                "Un Lugar Llamado Notting Hill", "Antes del Amanecer", "Amélie", "Posdata: Te Amo", "Ghost: El Fantasma del Amor", 
+                "Eterno Resplandor de una Mente sin Recuerdos", "Cartas a Julieta", "Querido John", "La Propuesta", "Amigos con Beneficios",
+                "Un Amor para Recordar", "Medianoche en París", "Siempre el Mismo Día", "La Teoría del Todo", "Violet y Finch"
+            ],
+            comedia: [
+                "Son Como Niños", "¿Qué Pasó Ayer?", "Supercool", "Una Esposa de Mentira", "La Máscara", 
+                "Shrek 2", "Mi Pobre Angelito", "Y dónde están las rubias", "Luna de Miel en Familia", "Guerra de Papás", 
+                "Click: Perdiendo el Control", "Ace Ventura", "Zoolander", "Deadpool", "Legalmente Rubia", 
+                "American Pie", "Virgen a los 40", "Ted", "Un Espía y Medio", "Comando Especial",
+                "Norbit", "Mi Abuelo es un Peligro", "Guerra de Novias", "Socios por Accidente", "Mentiroso, Mentiroso"
+            ],
+            terror: [
+                "El Conjuro", "Siniestro", "Hereditary", "Un Lugar en Silencio", "Fragmentado", 
+                "Bárbaro", "Insidioso", "El Exorcista", "It (Eso)", "Actividad Paranormal", 
+                "La Noche del Demonio", "Midsommar", "El Legado del Diablo", "El Teléfono Negro", "Scream", 
+                "Pesadilla en la Calle Elm", "Viernes 13", "El Resplandor", "Anabelle", "La Monja",
+                "El Faro", "Estación Zombie (Train to Busan)", "¡Huye! (Get Out)", "La Bruja", "Us (Nosotros)"
+            ],
+            accion: [
+                "John Wick", "Rápidos y Furiosos", "Mad Max: Fury Road", "Gladiador", "Top Gun: Maverick", 
+                "Duro de Matar", "El Caballero de la Noche", "Misión Imposible", "Avengers: Endgame", "Búsqueda Implacable", 
+                "Terminator 2", "Matrix", "Kill Bill", "Sin Tiempo para Morir", "Corazones de Hierro", 
+                "Identidad Desconocida", "El Lobo de Wall Street", "300", "Bastardos Sin Gloria", "El Protegido",
+                "Atómica", "Nadie (Nobody)", "Baby Driver", "Upgrade", "Tren Bala"
+            ],
+            animacion: [
+                "Spider-Man: Un Nuevo Universo", "Intensa-Mente", "Toy Story 3", "Cómo Entrenar a tu Dragón", "Coco", 
+                "Shrek", "Ratatouille", "Mi Villano Favorito", "Buscando a Nemo", "Los Increíbles", 
+                "Frozen", "Kung Fu Panda", "El Rey León", "Monsters Inc.", "Zootopia", 
+                "WALL-E", "Up: Una Aventura de Altura", "Madagascar", "Megamente", "Enredados",
+                "El Viaje de Chihiro", "Grandes Héroes", "Moana", "Klaus", "Sing: ¡Ven y canta!"
+            ],
+            "sci-fi": [
+                "Interestelar", "El Origen (Inception)", "Matrix", "Volver al Futuro", "Duna", 
+                "Blade Runner 2048", "Avatar", "Gravedad", "Misión Rescate", "The Truman Show", 
+                "Parque Jurásico", "Star Wars: El Imperio Contraataca", "Terminator", "El Planeta de los Simios", "La Llegada", 
+                "Ready Player One", "Sector 9", "Yo, Robot", "E.T.", "Ex Machina",
+                "Cloverfield", "Tenet", "El Efecto Mariposa", "Sin Límites", "Anon"
+            ]
+        };
+
+        // --- APARTADO SNACKS DE CHILE ---
+        const antojos = {
+            dulce: [
+                "Super 8", "Chocman", "Chocolate Trencito", "Sahne Nuss", "Galletas Morocha", 
+                "Gansito", "Galletas Nik de chocolate", "Calugas Suny", "Chubi", "Rolls de Ambrosoli", 
+                "Gatolate Dulce", "Bombones Garoto", "Galletas Frac de Chocolate", "Maltesers", "Krypo", 
+                "Mini Donas", "Galletas Oreo", "Galletas Obsesión", "Flan con manjar", "Mousse de chocolate",
+                "Nugatón", "Obsesión de Coco", "Lolly Choc", "Pingüinos Marinela", "Suny de Nuez"
+            ],
+            salado: [
+                "Ramitas de Queso Evercrips", "Papas Fritas Kryzpo", "Ramitas Impacto", "Maní Salado Marco Polo", "Papas Fritas Lay's Receta Casera", 
+                "Doritos Queso Atrevido", "Cheetos Torciditos", "Gatolate Salado", "Papas Pringles Cebolla", "Maní Japonés", 
+                "Critsen", "Galletas Torti-Ricas", "Suflés de queso Ortiz", "Pani-Tois", "Pistachos salados", 
+                "Galletas Club Social", "Aceitunas sevillanas", "Papas fritas al hilo", "Cheezels", "Tika Chips",
+                "Maní con pasas", "Doritos Flamin Hot", "Mizos de arroz", "Kryzpo Queso", "Serranitas saladas"
+            ],
+            comida_rapida: ["Completo Italiano", "Pizza familiar", "Hamburguesa con papas", "Chorrillana", "Sushi roll", "Nuggets", "Tacos"]
+        };
+
+        let generoSeleccionado = 'romance';
+        let saborSeleccionado = 'dulce';
+
+        // --- INICIALIZACIÓN Y SPLASH SCREEN ---
+        document.addEventListener("DOMContentLoaded", () => {
+            const splashScreen = document.getElementById('splash-screen');
+            setTimeout(() => {
+                splashScreen.style.opacity = '0';
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                }, 700);
+            }, 2500);
+
+            initHeartCounter();
+            renderChat();
+            selectGenre('romance');
+            selectSabor('dulce');
+            setInterval(renderChat, 60000);
+        });
+
+        // --- NAVEGACIÓN ---
+        function switchTab(tabId) {
+            const tabs = ['tab-pensando', 'tab-cine', 'tab-sabores', 'tab-azar'];
+            tabs.forEach(t => {
+                document.getElementById(t).classList.add('hidden');
+                document.getElementById(t).classList.remove('block');
+                
+                const navBtn = document.getElementById(`nav-${t}`);
+                navBtn.className = "flex flex-col items-center justify-center text-gray-400 focus:outline-none flex-1 py-1 cursor-pointer";
+                
+                if (t === tabId) {
+                    document.getElementById(t).classList.remove('hidden');
+                    document.getElementById(t).classList.add('block');
+                    if (t === 'tab-pensando') navBtn.className = "flex flex-col items-center justify-center text-rose-500 focus:outline-none flex-1 py-1 cursor-pointer";
+                    if (t === 'tab-cine') navBtn.className = "flex flex-col items-center justify-center text-purple-600 focus:outline-none flex-1 py-1 cursor-pointer";
+                    if (t === 'tab-sabores') navBtn.className = "flex flex-col items-center justify-center text-amber-600 focus:outline-none flex-1 py-1 cursor-pointer";
+                    if (t === 'tab-azar') navBtn.className = "flex flex-col items-center justify-center text-teal-600 focus:outline-none flex-1 py-1 cursor-pointer";
+                }
+            });
+        }
+
+        // --- 1. PENSANDO EN TI ---
+        const btnHeart = document.getElementById('btn-heart');
+        const heartCounter = document.getElementById('heart-counter');
+        const heartStatus = document.getElementById('heart-status');
+
+        function initHeartCounter() {
+            let count = localStorage.getItem('app_heart_count') || 0;
+            heartCounter.innerText = count;
+            if (count > 0) heartStatus.innerText = `¡Te han recordado ${count} veces en total! ❤️`;
+        }
+
+        btnHeart.addEventListener('click', () => {
+            let currentCount = parseInt(localStorage.getItem('app_heart_count') || 0) + 1;
+            localStorage.setItem('app_heart_count', currentCount);
+            heartCounter.innerText = currentCount;
+            heartStatus.innerText = "¡Pum! Pensamiento enviado con éxito. ✨";
+
+            btnHeart.classList.add('pulse-active');
+            setTimeout(() => btnHeart.classList.remove('pulse-active'), 300);
+            saveChatMessage("❤️ ¡Te acabo de recordar ahora mismo!");
+        });
+
+        const chatInput = document.getElementById('chat-input');
+        const btnSendChat = document.getElementById('btn-send-chat');
+        const chatMessages = document.getElementById('chat-messages');
+
+        btnSendChat.addEventListener('click', () => {
+            const text = chatInput.value.trim();
+            if (text === "") return;
+            saveChatMessage(text);
+            chatInput.value = "";
+        });
+
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') btnSendChat.click();
+        });
+
+        function saveChatMessage(text) {
+            let messages = JSON.parse(localStorage.getItem('app_chat_msg')) || [];
+            messages.push({ id: Date.now(), text: text, timestamp: Date.now() });
+            localStorage.setItem('app_chat_msg', JSON.stringify(messages));
+            renderChat();
+        }
+
+        function renderChat() {
+            chatMessages.innerHTML = "";
+            let messages = JSON.parse(localStorage.getItem('app_chat_msg')) || [];
+            const unDia = 24 * 60 * 60 * 1000;
+            const ahora = Date.now();
+            const mensajesValidos = messages.filter(msg => (ahora - msg.timestamp) < unDia);
+            
+            if (mensajesValidos.length !== messages.length) {
+                localStorage.setItem('app_chat_msg', JSON.stringify(mensajesValidos));
+            }
+
+            if (mensajesValidos.length === 0) {
+                chatMessages.innerHTML = `<div class="text-center text-gray-400 text-xs italic my-auto">No hay mensajes recientes.<br>Deja una burbuja.</div>`;
+                return;
+            }
+
+            mensajesValidos.forEach(msg => {
+                const date = new Date(msg.timestamp);
+                const horaString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const msgEl = document.createElement('div');
+                
+                if (msg.text.startsWith("❤️")) {
+                    msgEl.className = "bg-rose-50 border border-rose-200 rounded-2xl px-3 py-2 max-w-[85%] self-start shadow-sm space-y-0.5 break-words font-medium text-rose-700";
+                } else {
+                    msgEl.className = "bg-white border border-pink-100 rounded-2xl px-3 py-2 max-w-[85%] self-start shadow-sm space-y-0.5 break-words";
+                }
+
+                msgEl.innerHTML = `<div>${msg.text}</div><div class="text-[9px] text-gray-400 text-right">${horaString}</div>`;
+                chatMessages.appendChild(msgEl);
+            });
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // --- 2. CINE EN PAREJA ---
+        const btnSpinCine = document.getElementById('btn-spin-cine');
+        const wheelCineContainer = document.getElementById('wheel-cine-container');
+        const cineResult = document.getElementById('cine-result');
+        const movieList = document.getElementById('movie-list');
+        const movieListTitle = document.getElementById('movie-list-title');
+
+        function selectGenre(genre) {
+            generoSeleccionado = genre;
+            document.querySelectorAll('.genre-btn').forEach(btn => {
+                if (btn.innerText.toLowerCase().includes(genre.substring(0,4))) {
+                    btn.className = "genre-btn p-2 rounded-xl bg-purple-600 text-white text-center transition-colors cursor-pointer";
+                } else {
+                    btn.className = "genre-btn p-2 rounded-xl bg-white border border-purple-200 text-purple-700 text-center transition-colors cursor-pointer";
+                }
+            });
+
+            movieListTitle.innerText = `Catálogo para ${genre.toUpperCase()}:`;
+            movieList.innerHTML = "";
+            peliculas[genre].forEach(movie => {
+                const li = document.createElement('li');
+                li.className = "flex items-center gap-1 py-0.5 border-b border-gray-100 last:border-0";
+                li.innerHTML = `<i class="fa-solid fa-caret-right text-purple-400"></i> ${movie}`;
+                movieList.appendChild(li);
+            });
+        }
+
+        btnSpinCine.addEventListener('click', () => {
+            cineResult.classList.add('hidden');
+            wheelCineContainer.classList.add('spinning');
+            btnSpinCine.disabled = true;
+            btnSpinCine.innerText = "Eligiendo película...";
+
+            setTimeout(() => {
+                wheelCineContainer.classList.remove('spinning');
+                btnSpinCine.disabled = false;
+                btnSpinCine.innerHTML = `<i class="fa-solid fa-dice"></i> Girar Ruleta de Películas`;
+
+                const catalogo = peliculas[generoSeleccionado];
+                const azarMovie = catalogo[Math.floor(Math.random() * catalogo.length)];
+
+                document.getElementById('result-genre-label').innerText = `GÉNERO: ${generoSeleccionado.toUpperCase()}`;
+                document.getElementById('result-movie-title').innerText = azarMovie;
+                cineResult.classList.remove('hidden');
+            }, 2000);
+        });
+
+        // --- 3. SABORES Y SNACKS CHILENOS ---
+        const btnSpinSabor = document.getElementById('btn-spin-sabor');
+        const wheelSaborContainer = document.getElementById('wheel-sabor-container');
+        const saborResult = document.getElementById('sabor-result');
+
+        function selectSabor(sabor) {
+            saborSeleccionado = sabor;
+            document.querySelectorAll('.sabor-btn').forEach(btn => {
+                if (btn.id === `btn-sabor-${sabor}`) {
+                    btn.className = "sabor-btn p-2 rounded-xl bg-amber-500 text-white text-center transition-colors cursor-pointer";
+                } else {
+                    btn.className = "sabor-btn p-2 rounded-xl bg-white border border-amber-200 text-amber-700 text-center transition-colors cursor-pointer";
+                }
+            });
+        }
+
+        btnSpinSabor.addEventListener('click', () => {
+            saborResult.classList.add('hidden');
+            wheelSaborContainer.classList.add('spinning');
+            btnSpinSabor.disabled = true;
+            btnSpinSabor.innerText = "Girando ruleta de antojos...";
+
+            setTimeout(() => {
+                wheelSaborContainer.classList.remove('spinning');
+                btnSpinSabor.disabled = false;
+                btnSpinSabor.innerHTML = `<i class="fa-solid fa-rotate"></i> Girar Ruleta de Antojos`;
+
+                const catalogoComida = antojos[saborSeleccionado];
+                const azarComida = catalogoComida[Math.floor(Math.random() * catalogoComida.length)];
+
+                document.getElementById('result-sabor-label').innerText = `ANTOJO ${saborSeleccionado.replace('_',' ').toUpperCase()}`;
+                document.getElementById('result-food-title').innerText = `¡Salió: ${azarComida}! 😋`;
+                saborResult.classList.remove('hidden');
+            }, 2000);
+        });
+
+        // --- 4. TÚ O YO ---
+        const btnSpinAzar = document.getElementById('btn-spin-azar');
+        const wheelAzarContainer = document.getElementById('wheel-azar-container');
+        const azarResult = document.getElementById('azar-result');
+        const resultAzarTitle = document.getElementById('result-azar-title');
+
+        btnSpinAzar.addEventListener('click', () => {
+            const op1 = document.getElementById('opcion-1').value.trim();
+            const op2 = document.getElementById('opcion-2').value.trim();
+
+            if (op1 === "" || op2 === "") {
+                alert("¡Por favor, escriban dos opciones antes de girar la ruleta!");
+                return;
+            }
+
+            azarResult.classList.add('hidden');
+            wheelAzarContainer.classList.add('spinning');
+            btnSpinAzar.disabled = true;
+            btnSpinAzar.innerText = "Decidiendo el destino...";
+
+            setTimeout(() => {
+                wheelAzarContainer.classList.remove('spinning');
+                btnSpinAzar.disabled = false;
+                btnSpinAzar.innerHTML = `<i class="fa-solid fa-bolt"></i> Decidir al Azar`;
+
+                const ganador = Math.random() < 0.5 ? op1 : op2;
+                resultAzarTitle.innerText = `¡${ganador}! 🎉`;
+                azarResult.classList.remove('hidden');
+            }, 2000);
+        });
+
+    </script>
+</body>
+</html>
