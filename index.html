@@ -334,14 +334,24 @@
         let saborSeleccionado = 'dulce';
 
         // --- INICIALIZACIÓN Y SPLASH SCREEN ---
-        document.addEventListener("DOMContentLoaded", () => {
-            const splashScreen = document.getElementById('splash-screen');
-            setTimeout(() => {
-                splashScreen.style.opacity = '0';
-                setTimeout(() => {
-                    splashScreen.style.display = 'none';
-                }, 700);
-            }, 2500);
+window.addEventListener("load", () => { // Cambiado de DOMContentLoaded a window.load
+    const splashScreen = document.getElementById('splash-screen');
+    
+    // Esperamos a que TODO cargue (imágenes, fuentes, scripts) antes de ocultar
+    setTimeout(() => {
+        splashScreen.style.opacity = '0';
+        setTimeout(() => {
+            splashScreen.style.display = 'none';
+        }, 700);
+    }, 1000); // 1 segundo extra de margen
+
+    initHeartCounter();
+    renderChat();
+    selectGenre('romance');
+    selectSabor('dulce');
+    setInterval(renderChat, 60000);
+});
+
 
             initHeartCounter();
             renderChat();
