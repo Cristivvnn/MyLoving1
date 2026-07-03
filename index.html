@@ -324,26 +324,33 @@
                 "Galletas Club Social", "Aceitunas sevillanas", "Papas fritas al hilo", "Cheezels", "Tika Chips",
                 "Maní con pasas", "Doritos Flamin Hot", "Mizos de arroz", "Kryzpo Queso", "Serranitas saladas"],
                 
-            comida_rapida: ["Su Tocomple Italiano", "Pizza familiar", "Hamburguesa con papas", "Chorrillana", "Hand Roll de Pollo", "Nuggets", "Tacos", "Sushi",
-                           "Hand Roll de Carne"],
-        
-        
-        };
+            comida_rapida: [
+    "Su Tocomple Italiano", 
+    "Pizza familiar", 
+    "Hamburguesa con papas", 
+    "Chorrillana", 
+    "Hand Roll de Pollo", 
+    "Nuggets", 
+    "Tacos", 
+    "Sushi", // <-- ¡Aquí faltaba esta coma!
+    "Hand Roll de Carne"
+],
+
 
         let generoSeleccionado = 'romance';
         let saborSeleccionado = 'dulce';
 
-        // --- INICIALIZACIÓN Y SPLASH SCREEN ---
-window.addEventListener("load", () => { // Cambiado de DOMContentLoaded a window.load
+// --- INICIALIZACIÓN Y SPLASH SCREEN ---
+window.addEventListener("load", () => { 
     const splashScreen = document.getElementById('splash-screen');
     
-    // Esperamos a que TODO cargue (imágenes, fuentes, scripts) antes de ocultar
+    // Esperamos 1.5 segundos adicionales para asegurar una transición suave
     setTimeout(() => {
         splashScreen.style.opacity = '0';
         setTimeout(() => {
             splashScreen.style.display = 'none';
         }, 700);
-    }, 1000); // 1 segundo extra de margen
+    }, 1500); 
 
     initHeartCounter();
     renderChat();
@@ -351,6 +358,8 @@ window.addEventListener("load", () => { // Cambiado de DOMContentLoaded a window
     selectSabor('dulce');
     setInterval(renderChat, 60000);
 });
+
+        
 
 
             initHeartCounter();
